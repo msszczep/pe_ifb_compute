@@ -1,8 +1,10 @@
 from random import randrange
 from math import floor
+from os.path import exists
+import json
 
-number_of_products = 100
-population = 100000
+number_of_products = 300
+population = 1000000
 
 def generate_wc_product(product_id):
     return {"id": product_id, "supply": randrange(1, 11)}
@@ -57,5 +59,13 @@ def create_nationish(population_size, num_of_products):
             "ccs": ccs_to_return}
 
 if __name__ == "__main__":
-    nationish = create_nationish(population, number_of_products)
-    print(len(nationish["ccs"]), len(nationish["wcs"]))
+    if exists("./nationish.json"):
+       with open('nationish.json', 'r') as openfile:
+           nationish = json.load(openfile)
+       print(len(nationish["ccs"]), len(nationish["wcs"]))
+    else:
+       nationish = create_nationish(population, number_of_products)
+       json_object = json.dump(nationish, indent=4)
+       with open("nationish.json", "w") as outfile:
+           outfile.write(json_object)
+
