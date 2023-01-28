@@ -1,71 +1,37 @@
 from random import randrange
 from math import floor
-from os.path import exists
-import json
 
-number_of_products = 300
+number_of_products = 1000
 population = 1000000
 
-def generate_wc_product(product_id):
-    return {"id": product_id, "supply": randrange(1, 11)}
-
-  
-def generate_cc_product(product_id):
-    return {"id": product_id, "demand": randrange(1, 11)}
-
-
-def generate_wc_products(num_of_products):
-    to_return = []
-    for i in list(range(1, num_of_products)):
-        to_return.append(generate_wc_product(i))
-    return to_return
-
-
-def generate_wc(wc_id, number_of_people, num_of_products):
-  return {"id": wc_id,
-          "population": number_of_people,
-          "products": generate_wc_products(num_of_products)}
-
-
-def generate_cc_products(num_of_products):
-    to_return = []
-    for i in list(range(1, num_of_products)):
-        to_return.append(generate_cc_product(i))
-    return to_return
-
-
-def generate_cc(cc_id, number_of_people, num_of_products):
-    return {"id": cc_id,
-            "population": number_of_people,
-            "products": generate_cc_products(num_of_products)}
-
+# wc_id,wc_population,
+# wc_id,product_id,product_supply
+# cc_id,cc_population
+# cc_id,product_id,product_demand
 
 def create_nationish(population_size, num_of_products):
     wc_id = 1
     cc_id = 2
     p_counter = 0
-    wcs_to_return = []
-    ccs_to_return = []
+    wc_population_file = open("wc_populations.txt", "a")
+    cc_population_file = open("cc_populations.txt", "a")
+    wc_product_file = open("wc_products.txt", "a")
+    cc_product_file = open("cc_products.txt", "a")
     while (p_counter < population_size):
         cc_population = randrange(2, 150)
         wc_population = floor(cc_population * 0.65)
-        p_counter = p_counter + 1
-        wcs_to_return.append(generate_wc(wc_id, wc_population, number_of_products))
-        ccs_to_return.append(generate_cc(cc_id, cc_population, number_of_products))
+        wc_population_file.write(str(wc_id) + "," + str(wc_population) + "\n")
+        cc_population_file.write(str(cc_id) + "," + str(cc_population) + "\n")
+        for product_id in list(range(1, num_of_products)):
+            wc_product_file.write(str(wc_id) + "," + str(product_id) + "," + str(randrange(1, 11)) + "\n")
+            cc_product_file.write(str(cc_id) + "," + str(product_id) + "," + str(randrange(1, 11)) + "\n")
+        p_counter = p_counter + cc_population
         wc_id = wc_id + 2
         cc_id = cc_id + 2
-        p_counter = p_counter + cc_population
-    return {"wcs": wcs_to_return,
-            "ccs": ccs_to_return}
+    wc_population_file.close()
+    cc_population_file.close()
+    wc_product_file.close()
+    cc_product_file.close()
 
 if __name__ == "__main__":
-    if exists("./nationish.json"):
-       with open('nationish.json', 'r') as openfile:
-           nationish = json.load(openfile)
-       print(len(nationish["ccs"]), len(nationish["wcs"]))
-    else:
-       nationish = create_nationish(population, number_of_products)
-       json_object = json.dump(nationish, indent=4)
-       with open("nationish.json", "w") as outfile:
-           outfile.write(json_object)
-
+    create_nationish(population, number_of_products)
