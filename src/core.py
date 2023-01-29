@@ -1,7 +1,9 @@
 from random import randrange
 from math import floor
+from guppy import hpy
+from time import perf_counter
 
-number_of_products = 1000
+number_of_products = 10000
 population = 1000000
 
 # wc_id,wc_population,
@@ -33,5 +35,29 @@ def create_nationish(population_size, num_of_products):
     wc_product_file.close()
     cc_product_file.close()
 
-if __name__ == "__main__":
+def analyze_heap():
+    perf_counter()
+    heap = hpy()
+
+    print("Heap Status At Starting : ")
+    heap_status1 = heap.heap()
+    print("Heap Size : ", heap_status1.size, " bytes\n")
+    print(heap_status1)
+
+    heap.setref()
+    print("\nHeap Status After Setting Reference Point : ")
+    heap_status2 = heap.heap()
+    print("Heap Size : ", heap_status2.size, " bytes\n")
+    print(heap_status2)
+
     create_nationish(population, number_of_products)
+
+    print("\nHeap Status After Creating Few Objects : ")
+    heap_status3 = heap.heap()
+    print("Heap Size : ", heap_status3.size, " bytes\n")
+    print(heap_status3)
+    print("\nMemory Usage After Creation Of Objects : ", heap_status3.size - heap_status2.size, " bytes")
+    perf_counter()
+
+if __name__ == "__main__":
+    analyze_heap()
