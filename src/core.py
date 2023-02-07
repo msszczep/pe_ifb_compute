@@ -3,7 +3,7 @@ from math import floor
 from guppy import hpy
 from time import perf_counter
 
-number_of_products = 10000
+number_of_products = 100000
 population = 1000000
 
 # wc_id,wc_population,

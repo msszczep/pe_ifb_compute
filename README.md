@@ -6,6 +6,8 @@ Researching the computational needs for an IFB in a participatory economy
 There are many sets of instructions on the web to learn how to install virtualenv, such as:
 [https://www.pythoncentral.io/how-to-install-virtualenv-python/](https://www.pythoncentral.io/how-to-install-virtualenv-python/)
 
+NB: `export PATH=/home/user/.local/bin:$PATH` 
+
 ## Load library
 
 For example:
