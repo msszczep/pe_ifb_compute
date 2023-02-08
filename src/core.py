@@ -11,6 +11,28 @@ population = 1000000
 # cc_id,cc_population
 # cc_id,product_id,product_demand
 
+def ifm():
+    cc_pop_file = open('cc_products.txt', 'r')
+    r = {}
+    i = 0
+    while True:
+        L = cc_pop_file.readline()
+        i = i + 1
+
+        if not L:
+            break
+
+        d = L.strip().split(",")
+        if i % 100000000 == 0: #mod 100 million
+            print(i)
+
+        try:
+            r[int(d[1])] = r[int(d[1])] + int(d[2])
+        except:
+            r[int(d[1])] = int(d[2])
+    cc_pop_file.close()
+    return r
+
 def create_nationish(population_size, num_of_products):
     wc_id = 1
     cc_id = 2
@@ -60,4 +82,6 @@ def analyze_heap():
     perf_counter()
 
 if __name__ == "__main__":
-    analyze_heap()
+    cc_p = ifm()
+    # print(cc_p)
+    #analyze_heap()
