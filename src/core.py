@@ -2,6 +2,7 @@ from random import randrange
 from math import floor
 from guppy import hpy
 from time import perf_counter
+import sqlite3
 
 number_of_products = 100000
 population = 1000000
@@ -10,6 +11,22 @@ population = 1000000
 # wc_id,product_id,product_supply
 # cc_id,cc_population
 # cc_id,product_id,product_demand
+
+def load_data_to_sqlite_db(file_to_use):
+    cc_pop_file = open(file_to_use, 'r')
+    con = sqlite3.connect("pe_ifb_compute.db")
+    cur = con.cursor()
+    cur.execute("CREATE TABLE products(council_type, council_id, product_id, quantity)")
+    cur.execute("CREATE INDEX product_id_index on products(product_id)")
+    while True:
+        L = cc_pop_file.readline()
+        if not L:
+            break
+        d = L.strip().split(",")
+        cur.execute("INSERT INTO products VALUES('cc', ?, ?, ?)", [d[0], d[1], d[2]])
+        con.commit()
+    cc_pop_file.close()
+    con.close() 
 
 def ifm():
     cc_pop_file = open('cc_products.txt', 'r')
@@ -82,6 +99,7 @@ def analyze_heap():
     perf_counter()
 
 if __name__ == "__main__":
-    cc_p = ifm()
+    load_data_to_sqlite_db('cc_products.txt')
+    #cc_p = ifm()
     # print(cc_p)
     #analyze_heap()
