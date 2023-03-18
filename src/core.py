@@ -12,12 +12,45 @@ population = 1000000
 # cc_id,cc_population
 # cc_id,product_id,product_demand
 
+def analyze_sqlite_db(file_to_use):
+    cc_pop_file = open(file_to_use, 'r')
+    con = sqlite3.connect("pe_ifb_compute.db")
+    cur = con.cursor()
+    r = cur.execute("SELECT * from products limit 10;") 
+    print(r.fetchall())
+    #r = cur.execute("SELECT COUNT(*) from products;") # (41 040 088,)
+    #print(r.fetchone())
+    #r2 = cur.execute("SELECT max(council_id) from products") # [('998',)]
+    #print(r2.fetchall())
+    #r3 = cur.execute("SELECT max(product_id) from products where council_id = '998'") # [('9999',)]
+    #print(r3.fetchall())
+    cc_pop_file.close()
+    con.close() 
+
+# 4989501:998,9999,8
+
+# idea: start over in a way?
+
 def load_data_to_sqlite_db(file_to_use):
     cc_pop_file = open(file_to_use, 'r')
     con = sqlite3.connect("pe_ifb_compute.db")
     cur = con.cursor()
     cur.execute("CREATE TABLE products(council_type, council_id, product_id, quantity)")
     cur.execute("CREATE INDEX product_id_index on products(product_id)")
+    while True:
+        L = cc_pop_file.readline()
+        if not L:
+            break
+        d = L.strip().split(",")
+        cur.execute("INSERT INTO products VALUES('cc', ?, ?, ?)", [d[0], d[1], d[2]])
+        con.commit()
+    cc_pop_file.close()
+    con.close()
+
+def load_more_data_to_sqlite_db(file_to_use):
+    cc_pop_file = open(file_to_use, 'r')
+    con = sqlite3.connect("pe_ifb_compute.db")
+    cur = con.cursor()
     while True:
         L = cc_pop_file.readline()
         if not L:
@@ -99,7 +132,9 @@ def analyze_heap():
     perf_counter()
 
 if __name__ == "__main__":
-    load_data_to_sqlite_db('cc_products.txt')
+    # load_data_to_sqlite_db('cc_products.txt')
     #cc_p = ifm()
     # print(cc_p)
     #analyze_heap()
+    analyze_sqlite_db('cc_products.txt')
+    #load_more_data_to_sqlite_db('cc_products_truncated.txt')
