@@ -21,3 +21,11 @@ Install libraries:
 - Increase scale to 100,000 products
 
 See: https://coderzcolumn.com/tutorials/python/guppy-heapy-profile-memory-usage-in-python
+
+Processing power: Add, adjust, update, announcement
+
+100 products / 100 people
+1000 products / 1000 people
+10000 products / 10000 people
+100000 products / 100000 persons
+1000000 products / 1000000 persons

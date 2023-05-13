@@ -4,8 +4,8 @@ from guppy import hpy
 from time import perf_counter
 import sqlite3
 
-number_of_products = 100000
-population = 1000000
+number_of_products = 100
+population = 100
 
 # wc_id,wc_population,
 # wc_id,product_id,product_supply
@@ -13,84 +13,54 @@ population = 1000000
 # cc_id,product_id,product_demand
 
 def analyze_sqlite_db(file_to_use):
-    cc_pop_file = open(file_to_use, 'r')
+    #cc_pop_file = open(file_to_use, 'r')
     con = sqlite3.connect("pe_ifb_compute.db")
     cur = con.cursor()
-    r = cur.execute("SELECT * from products limit 10;") 
-    print(r.fetchall())
-    #r = cur.execute("SELECT COUNT(*) from products;") # (41 040 088,)
-    #print(r.fetchone())
-    #r2 = cur.execute("SELECT max(council_id) from products") # [('998',)]
-    #print(r2.fetchall())
-    #r3 = cur.execute("SELECT max(product_id) from products where council_id = '998'") # [('9999',)]
-    #print(r3.fetchall())
-    cc_pop_file.close()
+    #r = cur.execute("SELECT * from products limit 10;") 
+    #print(r.fetchall())
+    # r = cur.execute("SELECT COUNT(*) from cc_products_data;") # (1333786662,)
+    r = cur.execute("SELECT COUNT(*) from wc_products_data;") #
+    print(r.fetchone())
+    #cc_pop_file.close()
     con.close() 
 
-# 4989501:998,9999,8
-
-# idea: start over in a way?
-
-def load_data_to_sqlite_db(file_to_use):
-    cc_pop_file = open(file_to_use, 'r')
-    con = sqlite3.connect("pe_ifb_compute.db")
+def determine_surplus_for_all_products(population, number_of_products):
+    con = sqlite3.connect("pe_ifb_compute_" + str(population_size) + "_" + str(num_products) + ".db")
     cur = con.cursor()
-    cur.execute("CREATE TABLE products(council_type, council_id, product_id, quantity)")
-    cur.execute("CREATE INDEX product_id_index on products(product_id)")
+    for i in range(numer_of_products):
+    # i = i + 1
+    #r = cur.execute("SELECT * from products limit 10;") 
+    #print(r.fetchall())
+    # r = cur.execute("SELECT COUNT(*) from cc_products_data;") # (1333786662,)
+    r = cur.execute("SELECT COUNT(*) from wc_products_data;") #
+    print(r.fetchone())
+    #cc_pop_file.close()
+    con.close()
+
+def load_data_to_sqlite_db(population, number_of_products, council_type):
+    product_file = open(council_type + "_products_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
+    con = sqlite3.connect("pe_ifb_compute_" + str(population_size) + "_" + str(num_products) + ".db")
+    cur = con.cursor()
+    cur.execute("CREATE TABLE " + council_type + "_products(council_id, product_id, quantity)")
+    cur.execute("CREATE INDEX product_id_index on " + council_type + "_products(product_id)")
     while True:
-        L = cc_pop_file.readline()
+        L = wc_product_file.readline()
         if not L:
             break
         d = L.strip().split(",")
-        cur.execute("INSERT INTO products VALUES('cc', ?, ?, ?)", [d[0], d[1], d[2]])
+        cur.execute("INSERT INTO products VALUES('" + council_type + "', ?, ?, ?)", [d[0], d[1], d[2]])
         con.commit()
     cc_pop_file.close()
     con.close()
 
-def load_more_data_to_sqlite_db(file_to_use):
-    cc_pop_file = open(file_to_use, 'r')
-    con = sqlite3.connect("pe_ifb_compute.db")
-    cur = con.cursor()
-    while True:
-        L = cc_pop_file.readline()
-        if not L:
-            break
-        d = L.strip().split(",")
-        cur.execute("INSERT INTO products VALUES('cc', ?, ?, ?)", [d[0], d[1], d[2]])
-        con.commit()
-    cc_pop_file.close()
-    con.close() 
-
-def ifm():
-    cc_pop_file = open('cc_products.txt', 'r')
-    r = {}
-    i = 0
-    while True:
-        L = cc_pop_file.readline()
-        i = i + 1
-
-        if not L:
-            break
-
-        d = L.strip().split(",")
-        if i % 100000000 == 0: #mod 100 million
-            print(i)
-
-        try:
-            r[int(d[1])] = r[int(d[1])] + int(d[2])
-        except:
-            r[int(d[1])] = int(d[2])
-    cc_pop_file.close()
-    return r
-
-def create_nationish(population_size, num_of_products):
+def create_nationish_files(population_size, num_of_products):
     wc_id = 1
     cc_id = 2
     p_counter = 0
-    wc_population_file = open("wc_populations.txt", "a")
-    cc_population_file = open("cc_populations.txt", "a")
-    wc_product_file = open("wc_products.txt", "a")
-    cc_product_file = open("cc_products.txt", "a")
+    wc_population_file = open("wc_populations_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
+    cc_population_file = open("cc_populations_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
+    wc_product_file = open("wc_products_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
+    cc_product_file = open("wc_products_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
     while (p_counter < population_size):
         cc_population = randrange(2, 150)
         wc_population = floor(cc_population * 0.65)
@@ -122,7 +92,10 @@ def analyze_heap():
     print("Heap Size : ", heap_status2.size, " bytes\n")
     print(heap_status2)
 
-    create_nationish(population, number_of_products)
+    create_nationish_files(population, number_of_products)
+    load_data_to_sqlite_db(population, number_of_products, 'wc')
+    load_data_to_sqlite_db(population, number_of_products, 'cc')
+    determine_surplus_for_all_products(population, number_of_products)
 
     print("\nHeap Status After Creating Few Objects : ")
     heap_status3 = heap.heap()
@@ -132,9 +105,6 @@ def analyze_heap():
     perf_counter()
 
 if __name__ == "__main__":
-    # load_data_to_sqlite_db('cc_products.txt')
-    #cc_p = ifm()
-    # print(cc_p)
-    #analyze_heap()
-    analyze_sqlite_db('cc_products.txt')
-    #load_more_data_to_sqlite_db('cc_products_truncated.txt')
+    analyze_heap()
+    #analyze_sqlite_db('wc_products.txt')
+    #load_more_data_to_sqlite_db('wc_products.txt')
