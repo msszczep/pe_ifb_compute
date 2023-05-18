@@ -27,14 +27,13 @@ def analyze_sqlite_db(file_to_use):
 def determine_surplus_for_all_products(population, number_of_products):
     con = sqlite3.connect("pe_ifb_compute_" + str(population_size) + "_" + str(num_products) + ".db")
     cur = con.cursor()
-    for i in range(numer_of_products):
-    # i = i + 1
-    #r = cur.execute("SELECT * from products limit 10;") 
-    #print(r.fetchall())
-    # r = cur.execute("SELECT COUNT(*) from cc_products_data;") # (1333786662,)
-    r = cur.execute("SELECT COUNT(*) from wc_products_data;") #
-    print(r.fetchone())
-    #cc_pop_file.close()
+    supply_data = cur.execute("SELECT product_id, sum(product_supply) from wc_products GROUP_BY product_id order by product_id;")
+    demand_data = cur.execute("SELECT product_id, sum(product_demand) from cc_products GROUP_BY product_id order by product_id;")
+    print("SUPPLY DATA:")
+    print(supply_data.fetchall())
+    print("DEMAND DATA:")
+    print(demand_data.fetchall())
+    # adjust price: (demand / supply) * previous_price
     con.close()
 
 def load_data_to_sqlite_db(population, number_of_products, council_type):
@@ -60,7 +59,7 @@ def create_nationish_files(population_size, num_of_products):
     wc_population_file = open("wc_populations_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
     cc_population_file = open("cc_populations_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
     wc_product_file = open("wc_products_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
-    cc_product_file = open("wc_products_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
+    cc_product_file = open("cc_products_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
     while (p_counter < population_size):
         cc_population = randrange(2, 150)
         wc_population = floor(cc_population * 0.65)
