@@ -12,23 +12,11 @@ population = 100
 # cc_id,cc_population
 # cc_id,product_id,product_demand
 
-def analyze_sqlite_db(file_to_use):
-    #cc_pop_file = open(file_to_use, 'r')
-    con = sqlite3.connect("pe_ifb_compute.db")
-    cur = con.cursor()
-    #r = cur.execute("SELECT * from products limit 10;") 
-    #print(r.fetchall())
-    # r = cur.execute("SELECT COUNT(*) from cc_products_data;") # (1333786662,)
-    r = cur.execute("SELECT COUNT(*) from wc_products_data;") #
-    print(r.fetchone())
-    #cc_pop_file.close()
-    con.close() 
-
 def determine_surplus_for_all_products(population_size, number_of_products):
-    con = sqlite3.connect("pe_ifb_compute_" + str(population_size) + "_" + str(num_products) + ".db")
+    con = sqlite3.connect("pe_ifb_compute_" + str(population_size) + "_" + str(number_of_products) + ".db")
     cur = con.cursor()
-    supply_data = cur.execute("SELECT product_id, sum(product_supply) from wc_products GROUP_BY product_id order by product_id;")
-    demand_data = cur.execute("SELECT product_id, sum(product_demand) from cc_products GROUP_BY product_id order by product_id;")
+    supply_data = cur.execute("SELECT product_id, sum(quantity) from wc_products GROUP BY product_id order by product_id;")
+    demand_data = cur.execute("SELECT product_id, sum(quantity) from cc_products GROUP BY product_id order by product_id;")
     print("SUPPLY DATA:")
     print(supply_data.fetchall())
     print("DEMAND DATA:")
@@ -37,19 +25,19 @@ def determine_surplus_for_all_products(population_size, number_of_products):
     con.close()
 
 def load_data_to_sqlite_db(population_size, number_of_products, council_type):
-    product_file = open(council_type + "_products_" + str(population_size) + "_" + str(number_of_products) + ".txt", "a")
+    product_file = open(council_type + "_products_" + str(population_size) + "_" + str(number_of_products) + ".txt", "r")
     con = sqlite3.connect("pe_ifb_compute_" + str(population_size) + "_" + str(number_of_products) + ".db")
     cur = con.cursor()
     cur.execute("CREATE TABLE " + council_type + "_products(council_id, product_id, quantity)")
-    cur.execute("CREATE INDEX product_id_index on " + council_type + "_products(product_id)")
+    cur.execute("CREATE INDEX " + council_type + "_product_id_index on " + council_type + "_products(product_id)")
     while True:
         L = product_file.readline()
         if not L:
             break
         d = L.strip().split(",")
-        cur.execute("INSERT INTO products VALUES('" + council_type + "', ?, ?, ?)", [d[0], d[1], d[2]])
+        cur.execute("INSERT INTO " + council_type + "_products VALUES(?, ?, ?)", [d[0], d[1], d[2]])
         con.commit()
-    cc_pop_file.close()
+    product_file.close()
     con.close()
 
 def create_nationish_files(population_size, number_of_products):
