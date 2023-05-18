@@ -16,9 +16,9 @@ def determine_surplus_for_all_products(population_size, number_of_products):
     con = sqlite3.connect("pe_ifb_compute_" + str(population_size) + "_" + str(number_of_products) + ".db")
     cur = con.cursor()
     supply_data = cur.execute("SELECT product_id, sum(quantity) from wc_products GROUP BY product_id order by product_id;")
-    demand_data = cur.execute("SELECT product_id, sum(quantity) from cc_products GROUP BY product_id order by product_id;")
     print("SUPPLY DATA:")
     print(supply_data.fetchall())
+    demand_data = cur.execute("SELECT product_id, sum(quantity) from cc_products GROUP BY product_id order by product_id;")
     print("DEMAND DATA:")
     print(demand_data.fetchall())
     # adjust price: (demand / supply) * previous_price
