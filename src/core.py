@@ -24,7 +24,7 @@ def analyze_sqlite_db(file_to_use):
     #cc_pop_file.close()
     con.close() 
 
-def determine_surplus_for_all_products(population, number_of_products):
+def determine_surplus_for_all_products(population_size, number_of_products):
     con = sqlite3.connect("pe_ifb_compute_" + str(population_size) + "_" + str(num_products) + ".db")
     cur = con.cursor()
     supply_data = cur.execute("SELECT product_id, sum(product_supply) from wc_products GROUP_BY product_id order by product_id;")
@@ -36,14 +36,14 @@ def determine_surplus_for_all_products(population, number_of_products):
     # adjust price: (demand / supply) * previous_price
     con.close()
 
-def load_data_to_sqlite_db(population, number_of_products, council_type):
-    product_file = open(council_type + "_products_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
-    con = sqlite3.connect("pe_ifb_compute_" + str(population_size) + "_" + str(num_products) + ".db")
+def load_data_to_sqlite_db(population_size, number_of_products, council_type):
+    product_file = open(council_type + "_products_" + str(population_size) + "_" + str(number_of_products) + ".txt", "a")
+    con = sqlite3.connect("pe_ifb_compute_" + str(population_size) + "_" + str(number_of_products) + ".db")
     cur = con.cursor()
     cur.execute("CREATE TABLE " + council_type + "_products(council_id, product_id, quantity)")
     cur.execute("CREATE INDEX product_id_index on " + council_type + "_products(product_id)")
     while True:
-        L = wc_product_file.readline()
+        L = product_file.readline()
         if not L:
             break
         d = L.strip().split(",")
@@ -52,20 +52,20 @@ def load_data_to_sqlite_db(population, number_of_products, council_type):
     cc_pop_file.close()
     con.close()
 
-def create_nationish_files(population_size, num_of_products):
+def create_nationish_files(population_size, number_of_products):
     wc_id = 1
     cc_id = 2
     p_counter = 0
-    wc_population_file = open("wc_populations_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
-    cc_population_file = open("cc_populations_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
-    wc_product_file = open("wc_products_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
-    cc_product_file = open("cc_products_" + str(population_size) + "_" + str(num_products) + ".txt"), "a")
+    wc_population_file = open("wc_populations_" + str(population_size) + "_" + str(number_of_products) + ".txt", "a")
+    cc_population_file = open("cc_populations_" + str(population_size) + "_" + str(number_of_products) + ".txt", "a")
+    wc_product_file = open("wc_products_" + str(population_size) + "_" + str(number_of_products) + ".txt", "a")
+    cc_product_file = open("cc_products_" + str(population_size) + "_" + str(number_of_products) + ".txt", "a")
     while (p_counter < population_size):
         cc_population = randrange(2, 150)
         wc_population = floor(cc_population * 0.65)
         wc_population_file.write(str(wc_id) + "," + str(wc_population) + "\n")
         cc_population_file.write(str(cc_id) + "," + str(cc_population) + "\n")
-        for product_id in list(range(1, num_of_products)):
+        for product_id in list(range(1, number_of_products + 1)):
             wc_product_file.write(str(wc_id) + "," + str(product_id) + "," + str(randrange(1, 11)) + "\n")
             cc_product_file.write(str(cc_id) + "," + str(product_id) + "," + str(randrange(1, 11)) + "\n")
         p_counter = p_counter + cc_population
