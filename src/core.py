@@ -16,12 +16,22 @@ def determine_surplus_for_all_products(population_size, number_of_products):
     con = sqlite3.connect("pe_ifb_compute_" + str(population_size) + "_" + str(number_of_products) + ".db")
     cur = con.cursor()
     supply_data = cur.execute("SELECT product_id, sum(quantity) from wc_products GROUP BY product_id order by product_id;")
+    supply_map = dict(supply_data.fetchall())
     print("SUPPLY DATA:")
-    print(supply_data.fetchall())
+    print(supply_map)
     demand_data = cur.execute("SELECT product_id, sum(quantity) from cc_products GROUP BY product_id order by product_id;")
+    demand_map = dict(demand_data.fetchall())
     print("DEMAND DATA:")
-    print(demand_data.fetchall())
-    # adjust price: (demand / supply) * previous_price
+    print(demand_map)
+    print('')
+    product_temp = 1
+    while product_temp <= number_of_products:
+        previous_price = 10
+        demand = demand_map[str(product_temp)]
+        supply = supply_map[str(product_temp)]
+        revised_price = (demand / supply) * previous_price
+        print(product_temp, demand, supply, revised_price)
+        product_temp = product_temp + 1
     con.close()
 
 def load_data_to_sqlite_db(population_size, number_of_products, council_type):
