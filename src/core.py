@@ -4,8 +4,8 @@ from guppy import hpy
 from time import perf_counter
 import sqlite3
 
-number_of_products = 100
-population = 100
+number_of_products = 10000
+population = 10000
 
 # wc_id,wc_population,
 # wc_id,product_id,product_supply
@@ -13,6 +13,7 @@ population = 100
 # cc_id,product_id,product_demand
 
 def determine_surplus_for_all_products(population_size, number_of_products):
+    function_start = perf_counter()
     con = sqlite3.connect("pe_ifb_compute_" + str(population_size) + "_" + str(number_of_products) + ".db")
     cur = con.cursor()
     supply_data = cur.execute("SELECT product_id, sum(quantity) from wc_products GROUP BY product_id order by product_id;")
@@ -33,6 +34,10 @@ def determine_surplus_for_all_products(population_size, number_of_products):
         print(product_temp, demand, supply, revised_price)
         product_temp = product_temp + 1
     con.close()
+    function_end = perf_counter()
+    execution_time = (function_end - function_start)
+    print("function execution_time:")
+    print(execution_time)
 
 def load_data_to_sqlite_db(population_size, number_of_products, council_type):
     product_file = open(council_type + "_products_" + str(population_size) + "_" + str(number_of_products) + ".txt", "r")
@@ -75,9 +80,7 @@ def create_nationish_files(population_size, number_of_products):
     cc_product_file.close()
 
 def analyze_heap():
-    perf_counter()
     heap = hpy()
-
     print("Heap Status At Starting : ")
     heap_status1 = heap.heap()
     print("Heap Size : ", heap_status1.size, " bytes\n")
@@ -99,7 +102,6 @@ def analyze_heap():
     print("Heap Size : ", heap_status3.size, " bytes\n")
     print(heap_status3)
     print("\nMemory Usage After Creation Of Objects : ", heap_status3.size - heap_status2.size, " bytes")
-    perf_counter()
 
 if __name__ == "__main__":
     analyze_heap()
