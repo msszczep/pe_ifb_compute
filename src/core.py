@@ -18,13 +18,8 @@ def determine_surplus_for_all_products(population_size, number_of_products):
     cur = con.cursor()
     supply_data = cur.execute("SELECT product_id, sum(quantity) from wc_products GROUP BY product_id order by product_id;")
     supply_map = dict(supply_data.fetchall())
-    print("SUPPLY DATA:")
-    print(supply_map)
     demand_data = cur.execute("SELECT product_id, sum(quantity) from cc_products GROUP BY product_id order by product_id;")
     demand_map = dict(demand_data.fetchall())
-    print("DEMAND DATA:")
-    print(demand_map)
-    print('')
     product_temp = 1
     while product_temp <= number_of_products:
         previous_price = 10
