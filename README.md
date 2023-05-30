@@ -29,3 +29,7 @@ Processing power: Add, adjust, update, announcement
 10000 products / 10000 people
 100000 products / 100000 persons
 1000000 products / 1000000 persons
+
+Run:
+
+`time python3 ./core.py > output_2.txt`
